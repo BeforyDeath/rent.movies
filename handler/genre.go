@@ -16,7 +16,7 @@ func (g genre) GetAll(w http.ResponseWriter, r *http.Request) {
 	res := Result{}
 	defer func() { json.NewEncoder(w).Encode(res) }()
 
-	req := request.GetJson(r)
+	req := request.GetJSON(r)
 
 	pages := new(pagination.Pages)
 	err := validator.GetRequest(req, pages)
@@ -25,7 +25,7 @@ func (g genre) GetAll(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	pages.Calculate(cfg.Api.PageLimit)
+	pages.Calculate(cfg.API.PageLimit)
 
 	genre := new(storage.Genre)
 

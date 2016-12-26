@@ -2,7 +2,7 @@ package handler
 
 import "github.com/BeforyDeath/rent.movies/config"
 
-type Api struct {
+type API struct {
 	User  user
 	Movie movie
 	Genre genre

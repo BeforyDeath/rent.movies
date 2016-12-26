@@ -23,7 +23,7 @@ func (u user) Login(w http.ResponseWriter, r *http.Request) {
 	res := Result{}
 	defer func() { json.NewEncoder(w).Encode(res) }()
 
-	req := request.GetJson(r)
+	req := request.GetJSON(r)
 
 	user := new(storage.User)
 	err := validator.GetRequest(req, user)
@@ -34,7 +34,7 @@ func (u user) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.Pass, _ = u.Hashed(user.Pass, cfg.Security.PasswordSalt)
-	err = user.Check()
+	err = user.Checking()
 	if err != nil {
 		res.Error = err.Error()
 		return
@@ -57,7 +57,7 @@ func (u user) Create(w http.ResponseWriter, r *http.Request) {
 	res := Result{}
 	defer func() { json.NewEncoder(w).Encode(res) }()
 
-	req := request.GetJson(r)
+	req := request.GetJSON(r)
 
 	user := new(storage.User)
 	err := validator.GetRequest(req, user)
@@ -85,7 +85,7 @@ func (u user) Create(w http.ResponseWriter, r *http.Request) {
 
 func (u user) Authorization(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		req := request.GetJson(r)
+		req := request.GetJSON(r)
 
 		if token, ok := req["token"]; ok && reflect.ValueOf(token).Kind() == reflect.String && token != "" {
 
@@ -128,7 +128,7 @@ func (u user) CreateToken(mySigningKey []byte, su *storage.User) (string, error)
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := make(jwt.MapClaims)
-	claims["user_id"] = su.Id
+	claims["userID"] = su.ID
 	claims["login"] = su.Login
 	//claims["Name"] = u.Name
 	//claims["Age"] = u.Age
@@ -153,5 +153,5 @@ func (u user) CheckToken(myToken string, myKey string) (jwt.MapClaims, error) {
 		return claims, nil
 	}
 
-	return nil, errors.New("This token is terrible!")
+	return nil, errors.New("This token is terrible")
 }

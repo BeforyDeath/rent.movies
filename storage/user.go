@@ -8,7 +8,7 @@ import (
 )
 
 type User struct {
-	Id       int
+	ID       int
 	Login    string `validate:"required"`
 	Pass     string `validate:"required"`
 	Name     string `validate:"neglect"`
@@ -18,13 +18,13 @@ type User struct {
 }
 
 const (
-	SQL_USER_CHECK  = `SELECT id, login, name, age, phone, createat FROM movies."user" WHERE login=$1 AND pass=$2`
-	SQL_USER_VALID  = `SELECT id FROM movies."user" WHERE login = $1`
-	SQL_USER_INSERT = `INSERT INTO movies."user" (login, pass, name, age, phone, createat) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	sqlUserCheck  = `SELECT id, login, name, age, phone, createat FROM movies."user" WHERE login=$1 AND pass=$2`
+	sqlUserValid  = `SELECT id FROM movies."user" WHERE login = $1`
+	sqlUserInsert = `INSERT INTO movies."user" (login, pass, name, age, phone, createat) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 )
 
-func (u *User) Check() error {
-	err := db.QueryRow(SQL_USER_CHECK, u.Login, u.Pass).Scan(&u.Id, &u.Login, &u.Name, &u.Age, &u.Phone, &u.CreateAt)
+func (u *User) Checking() error {
+	err := db.QueryRow(sqlUserCheck, u.Login, u.Pass).Scan(&u.ID, &u.Login, &u.Name, &u.Age, &u.Phone, &u.CreateAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("Bad login or password")
@@ -34,13 +34,14 @@ func (u *User) Check() error {
 	return nil
 }
 
+// Create user
 func (u *User) Create() error {
-	err := db.QueryRow(SQL_USER_VALID, u.Login).Scan(&u.Id)
+	err := db.QueryRow(sqlUserValid, u.Login).Scan(&u.ID)
 	if err == nil {
-		return errors.New(fmt.Sprintf("login %v exists", u.Login))
+		return fmt.Errorf("login %v exists", u.Login)
 	}
 
-	err = db.QueryRow(SQL_USER_INSERT, u.Login, u.Pass, u.Name, u.Age, u.Phone, u.CreateAt).Scan(&u.Id)
+	err = db.QueryRow(sqlUserInsert, u.Login, u.Pass, u.Name, u.Age, u.Phone, u.CreateAt).Scan(&u.ID)
 	if err != nil {
 		return err
 	}

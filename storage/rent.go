@@ -2,7 +2,6 @@ package storage
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -12,9 +11,9 @@ import (
 )
 
 type Rent struct {
-	Id       int
-	User_id  int
-	Movie_id int64 `validate:"required"`
+	ID       int
+	UserID   int
+	MovieID  int64 `validate:"required"`
 	Active   bool
 	CreateAt time.Time
 	CloseAt  time.Time
@@ -24,7 +23,7 @@ type RentList struct {
 	Active   bool
 	CreateAt time.Time
 	CloseAt  time.Time
-	Movie_id int
+	MovieID  int
 
 	Name        string
 	Year        int
@@ -33,24 +32,24 @@ type RentList struct {
 }
 
 const (
-	SQL_RENT_VALID  = `SELECT createAt FROM movies.rent WHERE user_id = $1 AND movie_id = $2 AND active = $3`
-	SQL_RENT_INSERT = `INSERT INTO movies.rent (user_id, movie_id, active, createAt) VALUES ($1, $2, $3, $4) RETURNING id`
-	SQL_RENT_UPDATE = `UPDATE movies.rent SET active=$3, closeAt=$4 WHERE active = true AND user_id = $1 AND movie_id = $2`
+	sqlRentValid  = `SELECT createAt FROM movies.rent WHERE userId = $1 AND movieId = $2 AND active = $3`
+	sqlRentInsert = `INSERT INTO movies.rent (userId, movieId, active, createAt) VALUES ($1, $2, $3, $4) RETURNING id`
+	sqlRentUpdate = `UPDATE movies.rent SET active=$3, closeAt=$4 WHERE active = true AND userId = $1 AND movieId = $2`
 
-	SQL_RENT_SELECT = `SELECT r.active, r.createAt, r.closeAt, m.id as movie_id, m.name, m.year,
+	sqlRentSelect = `SELECT r.active, r.createAt, r.closeAt, m.id as movieId, m.name, m.year,
 						array_to_string(movies.array_accum(g.name), ', ') AS genre, m.description `
-	SQL_RENT_SELECT_COUNT = `SELECT COUNT(DISTINCT (r.id)) `
-	SQL_RENT_FROM         = `FROM movies.rent r, movies.movie m, movies.movie_genre mg, movies.genre g
-						WHERE r.movie_id = m.id AND mg.movie_id = m.id AND mg.genre_id = g.id
-						AND r.user_id = $1 AND r.active = $2 `
-	SQL_RENT_GROUP = `GROUP BY r.id, m.id `
-	SQL_RENT_LIMIT = `LIMIT $3 OFFSET $4`
+	sqlRentCount = `SELECT COUNT(DISTINCT (r.id)) `
+	sqlRentFrom  = `FROM movies.rent r, movies.movie m, movies.movie_genre mg, movies.genre g
+						WHERE r.movieId = m.id AND mg.movieId = m.id AND mg.genreId = g.id
+						AND r.userId = $1 AND r.active = $2 `
+	sqlRentGroup = `GROUP BY r.id, m.id `
+	sqlRentLimit = `LIMIT $3 OFFSET $4`
 )
 
 func (r Rent) Take() error {
 
 	var CreateAt time.Time
-	err := db.QueryRow(SQL_RENT_VALID, r.User_id, r.Movie_id, true).Scan(&CreateAt)
+	err := db.QueryRow(sqlRentValid, r.UserID, r.MovieID, true).Scan(&CreateAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 
@@ -60,10 +59,10 @@ func (r Rent) Take() error {
 			}
 			defer tx.Rollback()
 
-			err = tx.QueryRow(SQL_RENT_INSERT, r.User_id, r.Movie_id, true, r.CreateAt).Scan(&r.Id)
+			err = tx.QueryRow(sqlRentInsert, r.UserID, r.MovieID, true, r.CreateAt).Scan(&r.ID)
 			if err != nil {
 				if strings.HasSuffix(err.Error(), "\"rent_movie_id_fk\"") {
-					return errors.New(fmt.Sprintf("An identifier of the movie %v does not exist", r.Movie_id))
+					return fmt.Errorf("An identifier of the movie %v does not exist", r.MovieID)
 				}
 				return err
 			}
@@ -74,21 +73,19 @@ func (r Rent) Take() error {
 			}
 
 			return nil
-
-		} else {
-			return err
 		}
+		return err
 	}
-	return errors.New(fmt.Sprintf("This movie you've already rented %v", CreateAt.Format("02-01-2006 15:04")))
+	return fmt.Errorf("This movie you've already rented %v", CreateAt.Format("02-01-2006 15:04"))
 }
 
-func (r Rent) GetTotalCount(user_id int, active bool) (tc int, err error) {
-	err = db.QueryRow(SQL_RENT_SELECT_COUNT+SQL_RENT_FROM, user_id, active).Scan(&tc)
+func (r Rent) GetTotalCount(userID int, active bool) (tc int, err error) {
+	err = db.QueryRow(sqlRentCount+sqlRentFrom, userID, active).Scan(&tc)
 	return
 }
 
-func (r Rent) GetAll(p *pagination.Pages, user_id int, active bool) ([]RentList, error) {
-	rows, err := db.Query(SQL_RENT_SELECT+SQL_RENT_FROM+SQL_RENT_GROUP+SQL_RENT_LIMIT, user_id, active, p.Limit, p.Offset)
+func (r Rent) GetAll(p *pagination.Pages, userID int, active bool) ([]RentList, error) {
+	rows, err := db.Query(sqlRentSelect+sqlRentFrom+sqlRentGroup+sqlRentLimit, userID, active, p.Limit, p.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +97,7 @@ func (r Rent) GetAll(p *pagination.Pages, user_id int, active bool) ([]RentList,
 		var CloseAt pq.NullTime
 
 		rl := RentList{}
-		err := rows.Scan(&rl.Active, &rl.CreateAt, &CloseAt, &rl.Movie_id, &rl.Name, &rl.Year, &rl.Genre, &rl.Description)
+		err := rows.Scan(&rl.Active, &rl.CreateAt, &CloseAt, &rl.MovieID, &rl.Name, &rl.Year, &rl.Genre, &rl.Description)
 		if err != nil {
 			return nil, err
 		}
@@ -120,15 +117,15 @@ func (r Rent) GetAll(p *pagination.Pages, user_id int, active bool) ([]RentList,
 }
 
 func (r *Rent) Completed() error {
-	err := db.QueryRow(SQL_RENT_VALID, r.User_id, r.Movie_id, true).Scan(&r.CreateAt)
+	err := db.QueryRow(sqlRentValid, r.UserID, r.MovieID, true).Scan(&r.CreateAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return errors.New(fmt.Sprintf("An identifier of the movie %v is not leased", r.Movie_id))
+			return fmt.Errorf("An identifier of the movie %v is not leased", r.MovieID)
 		}
 		return err
 	}
 
-	res, err := db.Exec(SQL_RENT_UPDATE, r.User_id, r.Movie_id, false, time.Now())
+	res, err := db.Exec(sqlRentUpdate, r.UserID, r.MovieID, false, time.Now())
 	if err != nil {
 		return err
 	}

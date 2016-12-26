@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -25,7 +24,7 @@ func GetRequest(r map[string]interface{}, obj interface{}) error {
 			if tag == "required" {
 				name := strings.ToLower(tField.Name)
 				if f, ok := r[name]; !ok || reflect.ValueOf(f).Kind() != reflect.String || f == "" {
-					return errors.New(fmt.Sprintf("invalid %v", name))
+					return fmt.Errorf("invalid %v", name)
 				}
 				vField.SetString(r[name].(string))
 			}
@@ -40,7 +39,7 @@ func GetRequest(r map[string]interface{}, obj interface{}) error {
 			if tag == "required" {
 				name := strings.ToLower(tField.Name)
 				if f, ok := r[name]; !ok || reflect.ValueOf(f).Kind() != reflect.Float64 || f.(float64) < 0 {
-					return errors.New(fmt.Sprintf("invalid %v", name))
+					return fmt.Errorf("invalid %v", name)
 				}
 				vField.SetInt(int64(r[name].(float64)))
 			}
@@ -55,7 +54,7 @@ func GetRequest(r map[string]interface{}, obj interface{}) error {
 			if tag == "required" {
 				name := strings.ToLower(tField.Name)
 				if f, ok := r[name]; !ok || reflect.ValueOf(f).Kind() != reflect.Bool {
-					return errors.New(fmt.Sprintf("invalid %v", name))
+					return fmt.Errorf("invalid %v", name)
 				}
 			}
 			if tag == "neglect" {

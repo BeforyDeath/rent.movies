@@ -1,10 +1,10 @@
 #rent.movies
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/BeforyDeath/rent.movies)](https://goreportcard.com/report/github.com/BeforyDeath/rent.movies)
 
 ##Описание проекта
 Сервис по аренде фильмов, выполненный в рамках тестового задания:
 >Спроектировать API, документировать и реализовать HTTP/REST сервис используя язык Golang и PostgreSQL.
-
 
 ##Установка и настройка
 Для запуска PostgreSQL без лишней настройки и установки через тернии, запускаем его из докера

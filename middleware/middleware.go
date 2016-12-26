@@ -10,7 +10,7 @@ import (
 	"github.com/BeforyDeath/rent.movies/handler"
 )
 
-func JsonContentType(next http.Handler) http.Handler {
+func JSONContentType(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		next.ServeHTTP(w, r)
@@ -19,11 +19,10 @@ func JsonContentType(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-// todo нуно приводить ключи к нижнему регистру!
-func FetchJsonRequest(next http.Handler) http.Handler {
+func FetchJSONRequest(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-
 		defer r.Body.Close()
+		// todo нуно приводить ключи к нижнему регистру!
 		var req map[string]interface{}
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {

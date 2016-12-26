@@ -47,10 +47,10 @@ func main() {
 	// todo переделать
 	handler.SetConfig(cfg)
 
-	api := new(handler.Api)
+	api := new(handler.API)
 	router := httprouter.New()
 
-	api.Alice.NewChain(middleware.JsonContentType, middleware.FetchJsonRequest)
+	api.Alice.NewChain(middleware.JSONContentType, middleware.FetchJSONRequest)
 
 	router.POST("/user", api.Alice.AddChain(api.User.Create))
 	router.POST("/login", api.Alice.AddChain(api.User.Login))
@@ -62,7 +62,7 @@ func main() {
 	router.POST("/rent/completed", api.Alice.AddChain(api.Rent.Completed, api.User.Authorization))
 	router.POST("/rent/leased", api.Alice.AddChain(api.Rent.Leased, api.User.Authorization))
 
-	fmt.Printf("Server started %s ...\n", cfg.Api.Listen)
-	fmt.Println(http.ListenAndServe(cfg.Api.Listen, router))
+	fmt.Printf("Server started %s ...\n", cfg.API.Listen)
+	fmt.Println(http.ListenAndServe(cfg.API.Listen, router))
 
 }

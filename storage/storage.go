@@ -29,9 +29,9 @@ func (s store) Close() {
 	db.Close()
 }
 
-func (s store) GetMigration(filename string) error {
+func (s store) GetMigration(fileName string) error {
 	path, _ := os.Getwd()
-	file, err := os.Open(path + "/" + filename)
+	file, err := os.Open(path + "/" + fileName)
 	if err != nil {
 		return err
 	}

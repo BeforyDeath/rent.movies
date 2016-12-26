@@ -3,23 +3,23 @@ package storage
 import "github.com/BeforyDeath/rent.movies/pagination"
 
 type Genre struct {
-	Id   int
+	ID   int
 	Name string
 }
 
 const (
-	SQL_GENRE_LIST  = `SELECT id, name FROM movies.genre ORDER BY name ASC LIMIT $1 OFFSET $2`
-	SQL_GENRE_COUNT = `SELECT COUNT(id) as c FROM movies.genre`
+	sqlGenreList  = `SELECT id, name FROM movies.genre ORDER BY name ASC LIMIT $1 OFFSET $2`
+	sqlGenreCount = `SELECT COUNT(id) as c FROM movies.genre`
 )
 
 func (g Genre) GetTotalCount() (tc int, err error) {
-	err = db.QueryRow(SQL_GENRE_COUNT).Scan(&tc)
+	err = db.QueryRow(sqlGenreCount).Scan(&tc)
 	return
 }
 
 func (g Genre) GetAll(p *pagination.Pages) ([]Genre, error) {
 
-	rows, err := db.Query(SQL_GENRE_LIST, p.Limit, p.Offset)
+	rows, err := db.Query(sqlGenreList, p.Limit, p.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (g Genre) GetAll(p *pagination.Pages) ([]Genre, error) {
 	res := make([]Genre, 0)
 	for rows.Next() {
 		genre := Genre{}
-		err := rows.Scan(&genre.Id, &genre.Name)
+		err := rows.Scan(&genre.ID, &genre.Name)
 		if err != nil {
 			return nil, err
 		}

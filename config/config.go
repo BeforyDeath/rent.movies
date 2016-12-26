@@ -8,7 +8,7 @@ import (
 
 type Сfg struct {
 	Database string
-	Api      api
+	API      api
 	Security security
 }
 
@@ -38,8 +38,8 @@ func NewConfig(path string) (*Сfg, error) {
 		return nil, err
 	}
 
-	if c.Api.Listen == "" {
-		c.Api.Listen = ":8085"
+	if c.API.Listen == "" {
+		c.API.Listen = ":8085"
 	}
 
 	return c, nil

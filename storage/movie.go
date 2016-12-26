@@ -2,12 +2,13 @@ package storage
 
 import (
 	"database/sql"
-	"github.com/BeforyDeath/rent.movies/pagination"
 	"strings"
+
+	"github.com/BeforyDeath/rent.movies/pagination"
 )
 
 type Movie struct {
-	Id          int
+	ID          int
 	Name        string
 	Description string
 	Year        int64  `validate:"neglect"`
@@ -15,53 +16,53 @@ type Movie struct {
 }
 
 const (
-	SQL_MOVIE_SELECT       = `SELECT m.id, m.name, m.year, array_to_string(movies.array_accum(g.name), ', ') as genre, m.description `
-	SQL_MOVIE_SELECT_COUNT = `SELECT COUNT(DISTINCT (m.id)) `
-	SQL_MOVIE_FROM         = `FROM movies.movie m, movies.movie_genre mg, movies.genre g WHERE mg.movie_id = m.id AND mg.genre_id = g.id `
-	SQL_MOVIE_YEAR         = `AND m.year = $4 `
-	SQL_MOVIE_GENRE        = `AND m.id IN (SELECT m.id FROM movies.movie m, movies.movie_genre mg, movies.genre g
-						WHERE mg.movie_id = m.id AND mg.genre_id = g.id AND g.name = $3 GROUP BY m.id) `
-	SQL_MOVIE_GROUP = `GROUP BY m.id `
-	SQL_MOVIE_LIMIT = `ORDER BY m.id DESC LIMIT $1 OFFSET $2`
+	sqlMovieSelect = `SELECT m.id, m.name, m.year, array_to_string(movies.array_accum(g.name), ', ') as genre, m.description `
+	sqlMovieCount  = `SELECT COUNT(DISTINCT (m.id)) `
+	sqlMovieFrom   = `FROM movies.movie m, movies.movie_genre mg, movies.genre g WHERE mg.movieId = m.id AND mg.genreId = g.id `
+	sqlMovieYear   = `AND m.year = $4 `
+	sqlMovieGenre  = `AND m.id IN (SELECT m.id FROM movies.movie m, movies.movie_genre mg, movies.genre g
+						WHERE mg.movieId = m.id AND mg.genreId = g.id AND g.name = $3 GROUP BY m.id) `
+	sqlMovieGroup = `GROUP BY m.id `
+	sqlMovieLimit = `ORDER BY m.id DESC LIMIT $1 OFFSET $2`
 )
 
 func (m Movie) ConstructSQL() map[string]string {
 	built := make(map[string]string)
 
-	var SQL_BUILT, SQL_BUILT_COUNT string
+	var sqlBuilt, sqlBuiltCount string
 	buildType := "limit"
 
-	SQL_BUILT += SQL_MOVIE_SELECT
-	SQL_BUILT_COUNT += SQL_MOVIE_SELECT_COUNT
+	sqlBuilt += sqlMovieSelect
+	sqlBuiltCount += sqlMovieCount
 
-	SQL_BUILT += SQL_MOVIE_FROM
-	SQL_BUILT_COUNT += SQL_MOVIE_FROM
+	sqlBuilt += sqlMovieFrom
+	sqlBuiltCount += sqlMovieFrom
 
 	if m.Year > 0 {
-		SQL_BUILT += SQL_MOVIE_YEAR
-		SQL_BUILT_COUNT += SQL_MOVIE_YEAR
+		sqlBuilt += sqlMovieYear
+		sqlBuiltCount += sqlMovieYear
 		buildType += "_year"
 	}
 	if m.Genre != "" {
-		SQL_BUILT += SQL_MOVIE_GENRE
-		SQL_BUILT_COUNT += SQL_MOVIE_GENRE
+		sqlBuilt += sqlMovieGenre
+		sqlBuiltCount += sqlMovieGenre
 		buildType += "_genre"
 	}
-	SQL_BUILT += SQL_MOVIE_GROUP
-	SQL_BUILT += SQL_MOVIE_LIMIT
+	sqlBuilt += sqlMovieGroup
+	sqlBuilt += sqlMovieLimit
 
 	if buildType == "limit_year" {
-		SQL_BUILT = strings.Replace(SQL_BUILT, "$4", "$3", 1)
+		sqlBuilt = strings.Replace(sqlBuilt, "$4", "$3", 1)
 	}
 	if buildType == "limit_genre" {
-		SQL_BUILT_COUNT = strings.Replace(SQL_BUILT_COUNT, "$3", "$1", 1)
+		sqlBuiltCount = strings.Replace(sqlBuiltCount, "$3", "$1", 1)
 	}
-	SQL_BUILT_COUNT = strings.Replace(SQL_BUILT_COUNT, "$3", "$2", 1)
-	SQL_BUILT_COUNT = strings.Replace(SQL_BUILT_COUNT, "$4", "$1", 1)
+	sqlBuiltCount = strings.Replace(sqlBuiltCount, "$3", "$2", 1)
+	sqlBuiltCount = strings.Replace(sqlBuiltCount, "$4", "$1", 1)
 
 	built["type"] = buildType
-	built["sql"] = SQL_BUILT
-	built["sql_count"] = SQL_BUILT_COUNT
+	built["sql"] = sqlBuilt
+	built["sql_count"] = sqlBuiltCount
 
 	return built
 }
@@ -107,7 +108,7 @@ func (m Movie) GetAll(built map[string]string, p *pagination.Pages) ([]Movie, er
 	res := make([]Movie, 0)
 	for rows.Next() {
 		movie := Movie{}
-		err := rows.Scan(&movie.Id, &movie.Name, &movie.Year, &movie.Genre, &movie.Description)
+		err := rows.Scan(&movie.ID, &movie.Name, &movie.Year, &movie.Genre, &movie.Description)
 		if err != nil {
 			return nil, err
 		}

@@ -31,22 +31,22 @@ CREATE TABLE movies.movie (
 CREATE SEQUENCE movies.movie_genre_id_seq;
 CREATE TABLE movies.movie_genre (
   id       INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('movies.movie_genre_id_seq'),
-  movie_id INTEGER,
-  genre_id INTEGER,
-  CONSTRAINT movie_genre_movie_id_fk FOREIGN KEY (movie_id) REFERENCES movies.movie (id),
-  CONSTRAINT movie_genre_genre_id_fk FOREIGN KEY (genre_id) REFERENCES movies.genre (id)
+  movieId INTEGER,
+  genreId INTEGER,
+  CONSTRAINT movie_genre_movie_id_fk FOREIGN KEY (movieId) REFERENCES movies.movie (id),
+  CONSTRAINT movie_genre_genre_id_fk FOREIGN KEY (genreId) REFERENCES movies.genre (id)
 );
 
 CREATE SEQUENCE movies.rent_id_seq;
 CREATE TABLE movies.rent (
   id       INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('movies.rent_id_seq'),
-  user_id  INTEGER,
-  movie_id INTEGER,
+  userId  INTEGER,
+  movieId INTEGER,
   active   BOOLEAN             NOT NULL,
   createAt TIMESTAMP           NOT NULL,
   closeAt  TIMESTAMP,
-  CONSTRAINT rent_user_id_fk FOREIGN KEY (user_id) REFERENCES movies.user (id),
-  CONSTRAINT rent_movie_id_fk FOREIGN KEY (movie_id) REFERENCES movies.movie (id)
+  CONSTRAINT rent_user_id_fk FOREIGN KEY (userId) REFERENCES movies.user (id),
+  CONSTRAINT rent_movie_id_fk FOREIGN KEY (movieId) REFERENCES movies.movie (id)
 );
 
 INSERT INTO movies.genre (id, name) VALUES (1, 'фантастика');
@@ -64,21 +64,21 @@ INSERT INTO movies.movie (id, name, description, year) VALUES (5, 'Идиокр�
 INSERT INTO movies.movie (id, name, description, year) VALUES (6, 'Клиника / Scrubs', 'Комедийно-драматический телесериал «Клиника» рассказывает о трудовых буднях молодого врача-интерна Джона Дорина и его приятеля Кристофера Терка.', 2001);
 INSERT INTO movies.movie (id, name, description, year) VALUES (7, 'Мир Дикого запада / Westworld', 'Являясь адаптацией одноименного полнометражного фильма, фантастический сериал перенесёт нас в недалёкое будущее, где одним из самых популярных развлечений станут тематические парки, реалистично воссоздающие достаточно популярные периоды в истории с помощью специальных роботов, полностью имитирующих внешний вид и поведение людей того времени.', 2016);
 
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (1, 1, 1);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (2, 1, 4);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (3, 2, 3);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (4, 2, 4);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (5, 3, 1);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (6, 3, 3);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (7, 3, 6);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (8, 4, 1);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (9, 4, 3);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (10, 4, 2);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (11, 5, 1);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (12, 5, 3);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (13, 5, 2);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (14, 6, 2);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (15, 6, 4);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (16, 6, 5);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (17, 7, 1);
-INSERT INTO movies.movie_genre (id, movie_id, genre_id) VALUES (18, 7, 5);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (1, 1, 1);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (2, 1, 4);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (3, 2, 3);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (4, 2, 4);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (5, 3, 1);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (6, 3, 3);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (7, 3, 6);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (8, 4, 1);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (9, 4, 3);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (10, 4, 2);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (11, 5, 1);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (12, 5, 3);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (13, 5, 2);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (14, 6, 2);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (15, 6, 4);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (16, 6, 5);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (17, 7, 1);
+INSERT INTO movies.movie_genre (id, movieId, genreId) VALUES (18, 7, 5);

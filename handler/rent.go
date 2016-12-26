@@ -17,7 +17,7 @@ func (re rent) Take(w http.ResponseWriter, r *http.Request) {
 	res := Result{}
 	defer func() { json.NewEncoder(w).Encode(res) }()
 
-	req := request.GetJson(r)
+	req := request.GetJSON(r)
 
 	rent := new(storage.Rent)
 	err := validator.GetRequest(req, rent)
@@ -28,8 +28,8 @@ func (re rent) Take(w http.ResponseWriter, r *http.Request) {
 	}
 
 	claims := request.GetClaims(r)
-	user_id := int(claims["user_id"].(float64))
-	rent.User_id = user_id
+	userID := int(claims["userID"].(float64))
+	rent.UserID = userID
 
 	rent.CreateAt = time.Now()
 
@@ -49,7 +49,7 @@ func (re rent) Completed(w http.ResponseWriter, r *http.Request) {
 	res := Result{}
 	defer func() { json.NewEncoder(w).Encode(res) }()
 
-	req := request.GetJson(r)
+	req := request.GetJSON(r)
 
 	rent := new(storage.Rent)
 	err := validator.GetRequest(req, rent)
@@ -60,8 +60,8 @@ func (re rent) Completed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	claims := request.GetClaims(r)
-	user_id := int(claims["user_id"].(float64))
-	rent.User_id = user_id
+	userID := int(claims["userID"].(float64))
+	rent.UserID = userID
 
 	err = rent.Completed()
 	if err != nil {
@@ -78,7 +78,7 @@ func (re rent) Leased(w http.ResponseWriter, r *http.Request) {
 	res := Result{}
 	defer func() { json.NewEncoder(w).Encode(res) }()
 
-	req := request.GetJson(r)
+	req := request.GetJSON(r)
 
 	pages := new(pagination.Pages)
 	err := validator.GetRequest(req, pages)
@@ -87,10 +87,10 @@ func (re rent) Leased(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	pages.Calculate(cfg.Api.PageLimit)
+	pages.Calculate(cfg.API.PageLimit)
 
 	claims := request.GetClaims(r)
-	user_id := int(claims["user_id"].(float64))
+	userID := int(claims["userID"].(float64))
 
 	var show = struct {
 		History bool `validate:"neglect"`
@@ -103,13 +103,13 @@ func (re rent) Leased(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rent := new(storage.Rent)
-	totalCount, err := rent.GetTotalCount(user_id, !show.History)
+	totalCount, err := rent.GetTotalCount(userID, !show.History)
 	if err != nil {
 		res.Error = err.Error()
 		return
 	}
 
-	rows, err := rent.GetAll(pages, user_id, !show.History)
+	rows, err := rent.GetAll(pages, userID, !show.History)
 	if err != nil {
 		res.Error = err.Error()
 		return
