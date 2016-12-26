@@ -22,7 +22,7 @@ func main() {
 
 	cfg, err := config.NewConfig("config.json")
 	if err != nil {
-		fmt.Printf("JSON invalid file config: %v", err)
+		fmt.Printf("JSON invalid file config: %v\n", err)
 		return
 	}
 
@@ -39,7 +39,7 @@ func main() {
 			fmt.Println(err)
 			return
 		}
-		fmt.Printf("Initialized databases from %v", *filename)
+		fmt.Printf("Initialized databases from %v\n", *filename)
 		return
 	}
 
@@ -61,7 +61,7 @@ func main() {
 	router.POST("/rent/completed", api.Alice.AddChain(api.Rent.Completed, api.User.Authorization))
 	router.POST("/rent/leased", api.Alice.AddChain(api.Rent.Leased, api.User.Authorization))
 
-	fmt.Printf("Server started %s ...", cfg.Api.Listen)
+	fmt.Printf("Server started %s ...\n", cfg.Api.Listen)
 	fmt.Println(http.ListenAndServe(cfg.Api.Listen, router))
 
 }
