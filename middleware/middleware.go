@@ -19,6 +19,7 @@ func JsonContentType(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
+// todo нуно приводить ключи к нижнему регистру!
 func FetchJsonRequest(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 

@@ -105,7 +105,7 @@ func (u user) Authorization(next http.Handler) http.Handler {
 
 		}
 
-		res := Result{Error: "One of the parameters specified was missing or invalid: address is taken"}
+		res := Result{Error: "One of the parameters specified was missing or invalid: address is token"}
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(res)
 
