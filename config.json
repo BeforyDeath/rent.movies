@@ -1,0 +1,13 @@
+{
+  "Database": "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable",
+  "Api": {
+    "Listen": ":8085",
+    "PageLimit": 100
+  },
+  "Security": {
+    "TokenSalt": "Token Salt",
+    "TokenExpired": 3600,
+    "PasswordSalt": "Password Salt"
+  }
+}
+
