@@ -1,6 +1,7 @@
 #rent.movies
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/BeforyDeath/rent.movies)](https://goreportcard.com/report/github.com/BeforyDeath/rent.movies)
+[![codebeat badge](https://codebeat.co/badges/7f88040a-164a-44c5-b8c5-980fee703bce)](https://codebeat.co/projects/github-com-beforydeath-rent-movies)
 
 ##Описание проекта
 Сервис по аренде фильмов, выполненный в рамках тестового задания:
