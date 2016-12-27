@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"reflect"
 	"time"
 
 	"github.com/BeforyDeath/rent.movies/request"
@@ -85,31 +84,23 @@ func (u user) Create(w http.ResponseWriter, r *http.Request) {
 
 func (u user) Authorization(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		req := request.GetJSON(r)
-
-		// todo избавиться от рефлекта
-		if token, ok := req["token"]; ok && reflect.ValueOf(token).Kind() == reflect.String && token != "" {
-
-			claims, err := u.CheckToken(token.(string), cfg.Security.TokenSalt)
+		token := r.Header.Get("X-Auth-Token")
+		if token != "" {
+			claims, err := u.CheckToken(token, cfg.Security.TokenSalt)
 			if err != nil {
 				res := Result{Error: err.Error()}
 				w.WriteHeader(http.StatusForbidden)
 				json.NewEncoder(w).Encode(res)
 				return
 			}
-
 			ctx := context.WithValue(r.Context(), "claims", claims)
 			r = r.WithContext(ctx)
-
 			next.ServeHTTP(w, r)
 			return
-
 		}
-
 		res := Result{Error: "One of the parameters specified was missing or invalid: address is token"}
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(res)
-
 		return
 	}
 	return http.HandlerFunc(fn)
