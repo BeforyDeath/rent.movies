@@ -68,7 +68,7 @@ func (r Rent) create() error {
 	defer tx.Rollback()
 	err = tx.QueryRow(sqlRentInsert, r.UserID, r.MovieID, true, r.CreateAt).Scan(&r.ID)
 	if err != nil {
-		return r.errors(err)
+		return r.rowIsExist(err)
 	}
 
 	err = tx.Commit()
@@ -78,7 +78,7 @@ func (r Rent) create() error {
 	return nil
 }
 
-func (r Rent) errors(err error) error {
+func (r Rent) rowIsExist(err error) error {
 	if strings.HasSuffix(err.Error(), "\"rent_movie_id_fk\"") {
 		return fmt.Errorf("An identifier of the movie %v does not exist", r.MovieID)
 	}
@@ -91,7 +91,8 @@ func (r Rent) GetTotalCount(userID int, active bool) (tc int, err error) {
 }
 
 func (r Rent) GetAll(p *pagination.Pages, userID int, active bool) ([]RentMovie, error) {
-	rows, err := db.Query(sqlRentSelect+sqlRentFrom+sqlRentGroup+sqlRentLimit, userID, active, p.Limit, p.Offset)
+	sql := strings.Join([]string{sqlRentSelect, sqlRentFrom, sqlRentGroup, sqlRentLimit}, "")
+	rows, err := db.Query(sql, userID, active, p.Limit, p.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -102,31 +103,30 @@ func (r Rent) GetAll(p *pagination.Pages, userID int, active bool) ([]RentMovie,
 	var CloseAt pq.NullTime
 	for rows.Next() {
 
-		rl := RentMovie{}
-		err := rows.Scan(&rl.Active, &rl.CreateAt, &CloseAt, &rl.MovieID, &rl.Name, &rl.Year, &rl.Genre, &rl.Description)
+		rm := RentMovie{}
+		err := rows.Scan(&rm.Active, &rm.CreateAt, &CloseAt, &rm.MovieID, &rm.Name, &rm.Year, &rm.Genre, &rm.Description)
 		if err != nil {
 			return nil, err
 		}
 
 		if CloseAt.Valid {
-			rl.CloseAt = CloseAt.Time
+			rm.CloseAt = CloseAt.Time
 		}
-		res = append(res, rl)
+		res = append(res, rm)
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-
 	return res, nil
 }
 
 func (r *Rent) Completed() error {
 	err := db.QueryRow(sqlRentValid, r.UserID, r.MovieID, true).Scan(&r.CreateAt)
+	if err != nil && err == sql.ErrNoRows {
+		return fmt.Errorf("An identifier of the movie %v is not leased", r.MovieID)
+	}
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return fmt.Errorf("An identifier of the movie %v is not leased", r.MovieID)
-		}
 		return err
 	}
 
