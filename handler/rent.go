@@ -116,7 +116,7 @@ func (re rent) Leased(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Rows       []storage.RentList
+		Rows       []storage.RentMovie
 		TotalCount int
 	}{Rows: rows, TotalCount: totalCount}
 
