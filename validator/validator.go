@@ -19,54 +19,60 @@ func GetRequest(r map[string]interface{}, obj interface{}) error {
 			continue
 		}
 
-		switch vField.Kind() {
-		case reflect.String:
-			if tag == "required" {
-				name := strings.ToLower(tField.Name)
-				if f, ok := r[name]; !ok || reflect.ValueOf(f).Kind() != reflect.String || f == "" {
-					return fmt.Errorf("invalid %v", name)
-				}
-				vField.SetString(r[name].(string))
-			}
-			if tag == "neglect" {
-				name := strings.ToLower(tField.Name)
-				if f, ok := r[name]; ok && reflect.ValueOf(f).Kind() == reflect.String && f != "" {
-					vField.SetString(r[name].(string))
-				}
+		if tag == "required" {
+			res, err := find(tField.Name, vField.Kind(), r)
+			if err != nil {
+				return fmt.Errorf("%v (required)", err)
 			}
 
-		case reflect.Int64:
-			if tag == "required" {
-				name := strings.ToLower(tField.Name)
-				if f, ok := r[name]; !ok || reflect.ValueOf(f).Kind() != reflect.Float64 || f.(float64) < 0 {
-					return fmt.Errorf("invalid %v", name)
-				}
-				vField.SetInt(int64(r[name].(float64)))
+			err = write(vField, res)
+			if err != nil {
+				return err
 			}
-			if tag == "neglect" {
-				name := strings.ToLower(tField.Name)
-				if f, ok := r[name]; ok && reflect.ValueOf(f).Kind() == reflect.Float64 && f.(float64) >= 0 {
-					vField.SetInt(int64(r[name].(float64)))
-				}
-			}
-
-		case reflect.Bool:
-			if tag == "required" {
-				name := strings.ToLower(tField.Name)
-				if f, ok := r[name]; !ok || reflect.ValueOf(f).Kind() != reflect.Bool {
-					return fmt.Errorf("invalid %v", name)
-				}
-			}
-			if tag == "neglect" {
-				name := strings.ToLower(tField.Name)
-				if f, ok := r[name]; ok && reflect.ValueOf(f).Kind() == reflect.Bool {
-					vField.SetBool(f.(bool))
-				}
-			}
-
-		default:
-			return fmt.Errorf("Unsupported kind '%s'", vField.Kind())
 		}
+
+		if tag == "neglect" {
+			res, err := find(tField.Name, vField.Kind(), r)
+			if err == nil {
+				err := write(vField, res)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+	}
+	return nil
+}
+
+func find(nField string, tField reflect.Kind, r map[string]interface{}) (interface{}, error) {
+	name := strings.ToLower(nField)
+	if nObjField, ok := r[name]; ok {
+
+		tObjField := reflect.ValueOf(nObjField).Kind()
+		if tObjField == reflect.Float64 && tField == reflect.Int64 {
+			tField = reflect.Float64
+		}
+
+		if tObjField == tField {
+			return nObjField, nil
+		}
+
+		return nil, fmt.Errorf("Invalid type field '%v', expected %v", name, tField)
+	}
+	return nil, fmt.Errorf("Field '%v' not found", name)
+}
+
+func write(f reflect.Value, r interface{}) error {
+	switch f.Kind() {
+	case reflect.String:
+		f.SetString(r.(string))
+	case reflect.Int64:
+		f.SetInt(int64(r.(float64)))
+	case reflect.Bool:
+		f.SetBool(r.(bool))
+	default:
+		return fmt.Errorf("Unsupported kind '%s'", f.Kind())
 	}
 	return nil
 }

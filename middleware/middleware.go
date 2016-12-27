@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -27,11 +26,9 @@ func FetchJSONRequest(next http.Handler) http.Handler {
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			if err != io.EOF {
-				res := handler.Result{Error: "invalid JSON Request"}
+				res := handler.Result{Error: "Invalid JSON parsing"}
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(res)
-				// todo сделать логи
-				fmt.Printf("Invalid JSON Request: %v\n", err)
 				return
 			}
 		}
