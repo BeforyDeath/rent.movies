@@ -87,6 +87,7 @@ func (u user) Authorization(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		req := request.GetJSON(r)
 
+		// todo избавиться от рефлекта
 		if token, ok := req["token"]; ok && reflect.ValueOf(token).Kind() == reflect.String && token != "" {
 
 			claims, err := u.CheckToken(token.(string), cfg.Security.TokenSalt)
