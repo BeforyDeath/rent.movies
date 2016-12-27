@@ -13,10 +13,10 @@ import (
 )
 
 func main() {
-	// todo пройтись по golint report от goreportcard.com
-	// todo разобраться со структурой пакета базы, сделать пинг базы и реконект
-	// todo сделать логер
-	// todo перекрыть пакет errors, собрать свои коды ошибок
+	// todo переписать валидатор и конструктор
+	// todo разобраться со структурой пакета базы, сделать пинг базы
+	// todo сделать логгер
+	// todo добавить коды ошибок
 
 	filename := flag.String("f", "", "Initialized databases from filename")
 	flag.Parse()
