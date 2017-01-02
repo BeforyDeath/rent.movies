@@ -8,13 +8,9 @@ import (
 )
 
 type User struct {
-	ID    int
-	Login string `validate:"required"`
-	Pass  string `validate:"required"`
-	profileInfo
-}
-
-type profileInfo struct {
+	ID       int
+	Login    string `validate:"required"`
+	Pass     string `validate:"required"`
 	Name     string `validate:"neglect"`
 	Age      int64  `validate:"neglect"`
 	Phone    string `validate:"neglect"`
