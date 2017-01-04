@@ -4,7 +4,7 @@
 [![codebeat badge](https://codebeat.co/badges/7f88040a-164a-44c5-b8c5-980fee703bce)](https://codebeat.co/projects/github-com-beforydeath-rent-movies)
 
 ##Описание проекта
-PS.. Вариант в исполнении  _**"Clean Architecture to Go applications"**_ https://github.com/BeforyDeath/rent.movies.clear
+PS.. Вариант в исполнении  _**"Clean Architecture to Go applications"**_ https://github.com/BeforyDeath/rent.movies.clean
 
 Сервис по аренде фильмов, выполненный в рамках тестового задания:
 >Спроектировать API, документировать и реализовать HTTP/REST сервис используя язык Golang и PostgreSQL.
